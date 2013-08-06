@@ -9,7 +9,7 @@ body {
     color: #333;
 }
 
-.menu-area{
+.menu_area{
     font-size: 16px;
     color:black;
     
@@ -17,16 +17,16 @@ body {
 
 }
 
-.menu-item:hover {
+.menu_item:hover {
     color:gray;
     text-decoration: underline;
 }
-.menu-item {
+.menu_item {
     color: #333;
     text-decoration: none;
 }
 
-.login-area {
+.login_area {
     font-size: 13px;
     color: gray;
     position: absolute;
@@ -34,16 +34,16 @@ body {
     right: 10px;
 }
 
-.login-link {
+.login_link {
     color: gray;
     text-decoration: none;
 }
 
-.login-link:visited {
+.login_link:visited {
     color: gray;
 }
 
-.login-link:hover {
+.login_link:hover {
     text-decoration: underline;
 }
 
@@ -90,7 +90,7 @@ input[type=submit] {
   font-size: 16px;
 }
 
-.main-title {
+.main_title {
     display: block;
     color: #222;
     font-size: 40px;
@@ -104,12 +104,12 @@ input[type=submit] {
     margin-top: 15px;
 }
 
-.post-heading {
+.post_heading {
     position: relative;
     border-bottom: 3px solid #666;
 }
 
-.post-title {
+.post_title {
     font-size: 24px;
     font-weight: bold;
 
@@ -117,11 +117,11 @@ input[type=submit] {
     color: #333;
 }
 
-.post-title:visisted {
+.post_title:visisted {
     color: #333;
 }
 
-.post-date {
+.post_date {
     position: absolute;
     right: 0px;
     bottom: 0px;
@@ -129,7 +129,7 @@ input[type=submit] {
 
 }
 
-.post-content {
+.post_content {
     margin-top: 5px;
 }
 
