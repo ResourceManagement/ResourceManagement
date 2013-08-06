@@ -14,11 +14,9 @@
         | 
         <a class="menu-item" href="/admin/temp">Manage Company Administrators</a>
     </div>
-    <div style="position:relative;top:30px;">  
-    <h2>Welcome, {{username}}!</h2>
-    <br>
-    <br>
-    <p> asta ar fi pagina adiminului</p>
-    </div>
+    <div id="content" style="top:30px;position:relative;">
+         {% block content %}
+         {% endblock %}
+  </div>
   </body>
 </html>
