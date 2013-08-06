@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Admin page</title>
+    <link type="text/css" rel="stylesheet" href="/static/main.css" />
+  </head>
+
+  <body>
+    <div class="menu-area">
+        <a class="menu-item" href="/admin/list">Registered Companies </a>
+        |
+        <a class="menu-item" href="/admin/new">Create new Company </a>
+        | 
+        <a class="menu-item" href="/admin/temp">Manage Company Administrators</a>
+    </div>
+    <div id="content" style="top:30px;position:relative;">
+         {% block content %}
+         {% endblock %}
+  </div>
+  </body>
+</html>
