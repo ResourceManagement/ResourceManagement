@@ -10,7 +10,7 @@
             Username
           </td>
           <td>
-            <input type="text" name="username_company" value="{{username}}">
+            <input type="text" name="username_company" autocomplete="off" id="company_username">
           </td>
           <td class="error">
             {{error_username}}
@@ -22,7 +22,7 @@
             Password
           </td>
           <td>
-            <input type="password" name="password_company" value="">
+            <input type="password" name="password_company" id="company_password" value="" autocomplete="off">
           </td>
           <td class="error">
             {{error_password}}

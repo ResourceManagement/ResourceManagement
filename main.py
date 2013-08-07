@@ -74,33 +74,40 @@ class Handler(webapp2.RequestHandler):
         webapp2.RequestHandler.initialize(self, *a, **kw)
         uid = self.read_secure_cookie('user_id')
         self.user = uid and User.by_id(int(uid))
-
+    def isAdmin(self):
+        if self.user and self.user.user_class=='admin':
+            return True
+        else:
+            return False
 class CompanySignup(Handler):
     def get(self):
-        self.render('add_company.html')
+        if self.isAdmin():
+            self.render('add_company.html')
+        else:
+            self.redirect('/')
 
     def post(self):
         have_error = False
-        self.username = self.request.get('username_company')
-        self.password = self.request.get('password_company')
-        self.verify = self.request.get('verify_company')
-        self.email = self.request.get('email_company')
+        self.company.username = self.request.get('username_company')
+        self.company.password = self.request.get('password_company')
+        self.company.verify = self.request.get('verify_company')
+        self.company.email = self.request.get('email_company')
 
-        params = dict(username = self.username,
-                      email = self.email)
+        params = dict(username = self.company.username,
+                      email = self.company.email)
 
-        if not valid_username(self.username):
+        if not valid_username(self.company.username):
             params['error_username'] = "That's not a valid username."
             have_error = True
 
-        if not valid_password(self.password):
+        if not valid_password(self.company.password):
             params['error_password'] = "That wasn't a valid password."
             have_error = True
-        elif self.password != self.verify:
+        elif self.company.password != self.company.verify:
             params['error_verify'] = "Your passwords didn't match."
             have_error = True
 
-        if not valid_email(self.email):
+        if not valid_email(self.company.email):
             params['error_email'] = "That's not a valid email."
             have_error = True
 
@@ -130,24 +137,42 @@ def check_secure_val(secure_val):
         return val
 
 
-
+admin = False
 class Login(Handler):
     def get(self):
+        self.createAdmin()
         self.render('login-form.html')
-
+   
     def post(self):
-       username = self.request.get('username')
-       password = self.request.get('password')
+        username = self.request.get('username')
+        password = self.request.get('password')
+       
+        u = User.login(username, password)
 
-       u = User.login(username, password)
-       if u:
+        if u:
+           logging.error(u.user_class) 
            self.login(u)
-           if self.user and self.user.user_class=='admin':
-            self.redirect('/admin')
-       else:
+           if u.name and u.user_class=='admin':
+              logging.error('redirectez pe /admin')
+              self.redirect('/admin')
+        else:
            msg = 'Invalid login'
            self.render('login-form.html', error = msg)
-
+    def createAdmin(self):
+        global admin
+        if admin:
+            return
+        u = User.by_class('admin')
+       
+        if  u:
+            return
+        else:
+            logging.error('exista user admin ' + str(u))
+            u = User.register('God', 'herod','admin')
+            u.put()
+            admin=True
+            
+        
 def users_key(group = 'default'):
     return db.Key.from_path('users', group)
 def make_salt(length = 5):
@@ -166,7 +191,7 @@ def valid_pw(name, password, h):
 class AdminHandler(Handler):
     def get(self):
         if self.user and self.user.user_class=='admin':
-            self.render('welcome_admin.html', username = self.user.name)
+            self.render('temp.html', username = self.user.name)
         else:
             self.redirect('/')
 
@@ -186,7 +211,10 @@ class User(db.Model):
     def by_name(cls, name):
         u = User.all().filter('name =', name).get()
         return u
-
+    @classmethod
+    def by_class(cls,nume_clasa):
+        u = User.all().filter('user_class =', nume_clasa).get()
+        return u
     @classmethod
     def register(cls, name, pw, user_class,email = None):
         pw_hash = make_pw_hash(name, pw)
@@ -213,20 +241,30 @@ class TempHandler(Handler):
 class NewCompanyHandler(CompanySignup):
     def done(self):
         #make sure the user doesn't already exist
-        u = User.by_name(self.username)
+        u = User.by_name(self.company.username)
         if u:
             msg = 'That user already exists.'
             self.render('add_company.html', error_username = msg)
         else:
-            u = User.register(self.username, self.password,'company', self.email)
+            u = User.register(self.company.username, self.company.password,'company', self.company.email)
             u.put()
 
             self.redirect('/admin')
 
 class ListCompaniesHandler(Handler):
     def get(self):
-        companies = User.all().order('-name')
-        self.render('companies_list.html', companies = companies)
+        if self.isAdmin():
+            companies = User.all().order('-name')
+            self.render('companies_list.html', companies = companies)
+        else:
+            self.redirect('/')
+           
+   
+class LogoutHandler(Handler):
+    def get(self):
+        self.logout()
+        self.redirect('/')
+        
         
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -234,7 +272,8 @@ app = webapp2.WSGIApplication([
     ('/admin',AdminHandler),
     ('/admin/temp',TempHandler),
     ('/admin/new',NewCompanyHandler),
-    ('/admin/list',ListCompaniesHandler)
+    ('/admin/list',ListCompaniesHandler),
+    ('/logout',LogoutHandler)
 ], debug=True)
 
 
