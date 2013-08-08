@@ -88,39 +88,47 @@ class CompanySignup(Handler):
 
     def post(self):
         have_error = False
-        self.company.username = self.request.get('username_company')
-        self.company.password = self.request.get('password_company')
-        self.company.verify = self.request.get('verify_company')
-        self.company.email = self.request.get('email_company')
+        company = dict(username=self.request.get('username_company'),
+                       password = self.request.get('password_company'),
+                       verify = self.request.get('verify_company'),
+                       email = self.request.get('email_company'))
+        #self.company.username = self.request.get('username_company')
+        #self.company.password = self.request.get('password_company')
+        #self.company.verify = self.request.get('verify_company')
+        #self.company.email = self.request.get('email_company')
 
-        params = dict(username = self.company.username,
-                      email = self.company.email)
+        params = dict(username = self.request.get('username_company'),
+                      email = self.request.get('email_company'))
 
-        if not valid_username(self.company.username):
+        if not valid_username(company['username']):
             params['error_username'] = "That's not a valid username."
             have_error = True
 
-        if not valid_password(self.company.password):
+        if not valid_password(company['password']):
             params['error_password'] = "That wasn't a valid password."
             have_error = True
-        elif self.company.password != self.company.verify:
+        elif company['password'] != company['verify']:
             params['error_verify'] = "Your passwords didn't match."
             have_error = True
 
-        if not valid_email(self.company.email):
+        if not valid_email(company['email']):
             params['error_email'] = "That's not a valid email."
             have_error = True
 
         if have_error:
             self.render('add_company.html', **params)
         else:
-            self.done()
+            self.done(company)
 
     def done(self, *a, **kw):
         raise NotImplementedError
 class MainHandler(Handler):
     def get(self):
-        self.render("main.html")
+        if self.user:
+            if self.user.user_class=='admin':
+                self.redirect('/admin')
+        else:
+            self.render("main.html")
 
 secret = 'cornel'
 
@@ -239,14 +247,14 @@ class TempHandler(Handler):
         self.render('temp.html')
 
 class NewCompanyHandler(CompanySignup):
-    def done(self):
+    def done(self,company):
         #make sure the user doesn't already exist
-        u = User.by_name(self.company.username)
+        u = User.by_name(company['username'])
         if u:
             msg = 'That user already exists.'
             self.render('add_company.html', error_username = msg)
         else:
-            u = User.register(self.company.username, self.company.password,'company', self.company.email)
+            u = User.register(company['username'], company['password'],'company', company['email'])
             u.put()
 
             self.redirect('/admin')
