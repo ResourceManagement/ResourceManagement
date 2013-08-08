@@ -97,7 +97,7 @@ class CompanySignup(Handler):
         #self.company.verify = self.request.get('verify_company')
         #self.company.email = self.request.get('email_company')
 
-        params = dict(username = self.request.get('username_company'),
+        params = dict(company_username = self.request.get('username_company'),
                       email = self.request.get('email_company'))
 
         if not valid_username(company['username']):
