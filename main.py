@@ -28,21 +28,22 @@ import time
 from string import letters
 from google.appengine.ext import db
 
-template_dir= os.path.join(os.path.dirname(__file__),'templates')
-jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
+template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
     autoescape=True)
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
     return username and USER_RE.match(username)
 PASS_RE = re.compile(r"^.{3,20}$")
-    
+
 def valid_password(password):
     return password and PASS_RE.match(password)
 
-EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
+EMAIL_RE = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
 def valid_email(email):
     return not email or EMAIL_RE.match(email)
+
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -74,11 +75,14 @@ class Handler(webapp2.RequestHandler):
         webapp2.RequestHandler.initialize(self, *a, **kw)
         uid = self.read_secure_cookie('user_id')
         self.user = uid and User.by_id(int(uid))
+
     def isAdmin(self):
-        if self.user and self.user.user_class=='admin':
+        if self.user and self.user.user_class == 'admin':
             return True
         else:
             return False
+
+
 class CompanySignup(Handler):
     def get(self):
         if self.isAdmin():
@@ -89,16 +93,16 @@ class CompanySignup(Handler):
     def post(self):
         have_error = False
         company = dict(username=self.request.get('username_company'),
-                       password = self.request.get('password_company'),
-                       verify = self.request.get('verify_company'),
-                       email = self.request.get('email_company'))
-        #self.company.username = self.request.get('username_company')
-        #self.company.password = self.request.get('password_company')
-        #self.company.verify = self.request.get('verify_company')
-        #self.company.email = self.request.get('email_company')
+                       password=self.request.get('password_company'),
+                       verify=self.request.get('verify_company'),
+                       email=self.request.get('email_company'))
+        # self.company.username = self.request.get('username_company')
+        # self.company.password = self.request.get('password_company')
+        # self.company.verify = self.request.get('verify_company')
+        # self.company.email = self.request.get('email_company')
 
-        params = dict(company_username = self.request.get('username_company'),
-                      email = self.request.get('email_company'))
+        params = dict(company_username=self.request.get('username_company'),
+                      email=self.request.get('email_company'))
 
         if not valid_username(company['username']):
             params['error_username'] = "That's not a valid username."
@@ -125,7 +129,7 @@ class CompanySignup(Handler):
 class MainHandler(Handler):
     def get(self):
         if self.user:
-            if self.user.user_class=='admin':
+            if self.user.user_class == 'admin':
                 self.redirect('/admin')
         else:
             self.render("main.html")
@@ -150,43 +154,43 @@ class Login(Handler):
     def get(self):
         self.createAdmin()
         self.render('login-form.html')
-   
+
     def post(self):
         username = self.request.get('username')
         password = self.request.get('password')
-       
+
         u = User.login(username, password)
 
         if u:
-           logging.error(u.user_class) 
+           logging.error(u.user_class)
            self.login(u)
-           if u.name and u.user_class=='admin':
+           if u.name and u.user_class == 'admin':
               logging.error('redirectez pe /admin')
               self.redirect('/admin')
         else:
            msg = 'Invalid login'
-           self.render('login-form.html', error = msg)
+           self.render('login-form.html', error=msg)
     def createAdmin(self):
         global admin
         if admin:
             return
         u = User.by_class('admin')
-       
+
         if  u:
             return
         else:
             logging.error('exista user admin ' + str(u))
-            u = User.register('God', 'herod','admin')
+            u = User.register('God', 'herod', 'admin')
             u.put()
-            admin=True
-            
-        
-def users_key(group = 'default'):
+            admin = True
+
+
+def users_key(group='default'):
     return db.Key.from_path('users', group)
-def make_salt(length = 5):
+def make_salt(length=5):
     return ''.join(random.choice(letters) for x in xrange(length))
 
-def make_pw_hash(name, pw, salt = None):
+def make_pw_hash(name, pw, salt=None):
     if not salt:
         salt = make_salt()
     h = hashlib.sha256(name + pw + salt).hexdigest()
@@ -198,39 +202,39 @@ def valid_pw(name, password, h):
 
 class AdminHandler(Handler):
     def get(self):
-        if self.user and self.user.user_class=='admin':
-            self.render('temp.html', username = self.user.name)
+        if self.user and self.user.user_class == 'admin':
+            self.render('temp.html', username=self.user.name)
         else:
             self.redirect('/')
 
 
 class User(db.Model):
-    name = db.StringProperty(required = True)
-    pw_hash = db.StringProperty(required = True)
+    name = db.StringProperty(required=True)
+    pw_hash = db.StringProperty(required=True)
     user_class = db.StringProperty(required=True)
     email = db.StringProperty()
-    
+
 
     @classmethod
     def by_id(cls, uid):
-        return User.get_by_id(uid, parent = users_key())
+        return User.get_by_id(uid, parent=users_key())
 
     @classmethod
     def by_name(cls, name):
         u = User.all().filter('name =', name).get()
         return u
     @classmethod
-    def by_class(cls,nume_clasa):
+    def by_class(cls, nume_clasa):
         u = User.all().filter('user_class =', nume_clasa).get()
         return u
     @classmethod
-    def register(cls, name, pw, user_class,email = None):
+    def register(cls, name, pw, user_class, email=None):
         pw_hash = make_pw_hash(name, pw)
-        return User(parent = users_key(),
-                    name = name,
-                    pw_hash = pw_hash,
+        return User(parent=users_key(),
+                    name=name,
+                    pw_hash=pw_hash,
                     user_class=user_class,
-                    email = email)
+                    email=email)
 
     @classmethod
     def login(cls, name, pw):
@@ -238,23 +242,23 @@ class User(db.Model):
         if u and valid_pw(name, pw, u.pw_hash):
             return u
     def render(self):
-        #self._render_text = self.content.replace('\n', '<br>')
-        return render_str("user.html", p = self)
-        
-        
+        # self._render_text = self.content.replace('\n', '<br>')
+        return render_str("user.html", p=self)
+
+
 class TempHandler(Handler):
     def get(self):
         self.render('temp.html')
 
 class NewCompanyHandler(CompanySignup):
-    def done(self,company):
-        #make sure the user doesn't already exist
+    def done(self, company):
+        # make sure the user doesn't already exist
         u = User.by_name(company['username'])
         if u:
             msg = 'That user already exists.'
-            self.render('add_company.html', error_username = msg)
+            self.render('add_company.html', error_username=msg)
         else:
-            u = User.register(company['username'], company['password'],'company', company['email'])
+            u = User.register(company['username'], company['password'], 'company', company['email'])
             u.put()
 
             self.redirect('/admin')
@@ -263,31 +267,31 @@ class ListCompaniesHandler(Handler):
     def get(self):
         if self.isAdmin():
             companies = User.all().order('-name')
-            self.render('companies_list.html', companies = companies)
+            self.render('companies_list.html', companies=companies)
         else:
             self.redirect('/')
-           
-   
+
+
 class LogoutHandler(Handler):
     def get(self):
         self.logout()
         self.redirect('/')
-        
-        
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/login',Login),
-    ('/admin',AdminHandler),
-    ('/admin/temp',TempHandler),
-    ('/admin/new',NewCompanyHandler),
-    ('/admin/list',ListCompaniesHandler),
-    ('/logout',LogoutHandler)
+    ('/login', Login),
+    ('/admin', AdminHandler),
+    ('/admin/temp', TempHandler),
+    ('/admin/new', NewCompanyHandler),
+    ('/admin/list', ListCompaniesHandler),
+    ('/logout', LogoutHandler)
 ], debug=True)
 
 
 
 
-    
+
 
 
 

@@ -9,24 +9,24 @@ body {
     color: #333;
 }
 
-.menu_area{
-    font-size: 16px;
-    color:black;
-    
-    top:15px;
-
+/* subtitle */
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
-.menu_item:hover {
-    color:gray;
-    text-decoration: underline;
-}
-.menu_item {
-    color: #333;
+.page_title {
+    display: block;
+    color: #222;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: left;
+    margin-bottom: 30px;
     text-decoration: none;
 }
 
-.login_area {
+.menu_bar {
     font-size: 13px;
     color: gray;
     position: absolute;
@@ -34,28 +34,17 @@ body {
     right: 10px;
 }
 
-.login_link {
-    color: gray;
-    text-decoration: none;
-}
-
-.login_link:visited {
-    color: gray;
-}
-
-.login_link:hover {
+/* Not sure what this does */
+.menu_bar:hover {
+    color:red;
     text-decoration: underline;
 }
 
-h2 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
+.menu_item {
+    color: #333;
+    text-decoration: none;
 }
 
-.error {
-    color: #DC143C;
-}
 
 label {
   display: block;
@@ -66,18 +55,6 @@ label + label {
     margin-top: 20px;
 }
 
-input[type=text] {
-    width: 150px;
-    font-size: 16px;
-    padding: 1px;
-    font-family: monospace;
-}
-input[type=password] {
-    width: 150px;
-    font-size: 16px;
-    padding: 1px;
-    font-family: monospace;
-}
 
 textarea {
   width: 500px;
@@ -90,16 +67,41 @@ input[type=submit] {
   font-size: 16px;
 }
 
-.main_title {
-    display: block;
-    color: #222;
-    font-size: 40px;
+input[type=text] {
+    width: 150px;
+    font-size: 16px;
+    padding: 1px;
+    font-family: monospace;
+}
+
+input[type=password] {
+    width: 150px;
+    font-size: 16px;
+    padding: 1px;
+    font-family: monospace;
+}
+
+.in_line_error {
     font-weight: bold;
-    text-align: center;
-    margin-bottom: 30px;
+    color: #DC143C;
+}
+
+.button {
+    color: gray;
     text-decoration: none;
 }
 
+.button:visited {
+    color: gray;
+}
+
+.button:hover {
+    text-decoration: underline;
+}
+
+
+/* I need to sort these
+**************************************** */ 
 .post + .post {
     margin-top: 15px;
 }

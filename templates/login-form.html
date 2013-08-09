@@ -3,13 +3,13 @@
 <html>
   <head>
     <title>Resource Sharing - Sign In</title>
-    <link type="text/css" rel="stylesheet" href="/static/main.css" />
+    <link type="text/css" rel="stylesheet" href="/static/general.css" />
 
   </head>
 
   <body>
   <div>
-    <h2>Sign In</h2>
+    <h2 class="page_title">Sign In</h2>
     <form method="post">
       <table>
         <tr>
@@ -17,7 +17,7 @@
             Username
           </td>
           <td>
-            <input type="text" name="username" id="login_username" placeholder="username" value="{{username}}">
+            <input type="text" name="username" id="username" placeholder="username" value="{{username}}">
           </td>
         </tr>
 
@@ -26,16 +26,16 @@
             Password
           </td>
           <td>
-            <input type="password" name="password" id="login_password" placeholder="password" value="">
+            <input type="password" name="password" id="password" placeholder="password" value="">
           </td>
         </tr>
       </table>
 
-      <div id="error_invalid_credentials" class="error">
+      <div id="error" class="in_line_error">
         {{error}}
       </div>
 
-      <input type="submit" id="sign_in" value="Sign in">
+      <input type="submit" id="sign_in" class="button" value="Sign in">
     </form>
     </div>
   </body>
