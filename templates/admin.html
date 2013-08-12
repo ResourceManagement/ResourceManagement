@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Admin page</title>
+    <link type="text/css" rel="stylesheet" href="/static/general.css" />
+  </head>
+
+  <body>
+    <div class="menu_bar">
+        <a class="menu_item" href="/admin/companies">Manage Companies</a>
+        |
+        <a class="menu_item" href="/admin/manage_admins">Manage Admins</a>
+        | 
+        <a class="menu_item" href="/admin/edit_tags">Edit tags for resume quick view</a>
+    </div>
+    <div class="account_bar">
+       <a id="logout" class="account_item" href="/signout">Sign out</a>
+    </div>
+
+    <div id="content" style="top:30px;position:relative;">
+         {% block content %}
+         {% endblock %}
+  </div>
+  </body>
+</html>
